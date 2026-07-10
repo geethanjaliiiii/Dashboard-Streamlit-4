@@ -858,17 +858,18 @@ else:
             with k1:
                 
                 with st.container(border=True):
-                st.markdown("### 🎯 MAPE")
+                    
+                    st.markdown("### 🎯 MAPE")
         
-                st.metric(
-                    label="Before (GFS)",
-                    value=f"{overall_mape_before:.2f}%"
-                )
-        
-                st.metric(
-                    label="After (Daily Forecast)",
-                    value=f"{overall_mape_after:.2f}%"
-                )
+                    st.metric(
+                        label="Before (GFS)",
+                        value=f"{overall_mape_before:.2f}%"
+                    )
+            
+                    st.metric(
+                        label="After (Daily Forecast)",
+                        value=f"{overall_mape_after:.2f}%"
+                    )
 
             with k2:
                 st.markdown(
