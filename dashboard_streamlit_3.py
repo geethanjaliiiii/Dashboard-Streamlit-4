@@ -856,31 +856,18 @@ else:
             k1, k2, k3 = st.columns(3)
 
             with k1:
-                st.markdown(
-                    dedent(
-                        f"""
-                        <div class="performance-metric-card">
-                            <h3 style="color:#4c78d8;">
-                                🎯 MAPE
-                            </h3>
-
-                            <hr>
-
-                            <p><b>Before (GFS)</b></p>
-
-                            <h2 style="color:#4c78d8;">
-                                {overall_mape_before:.2f}%
-                            </h2>
-
-                            <p><b>After (Daily Forecast)</b></p>
-
-                            <h2 style="color:#ff3b30;">
-                                {overall_mape_after:.2f}%
-                            </h2>
-                        </div>
-                        """
-                    ),
-                    unsafe_allow_html=True
+                
+                with st.container(border=True):
+                st.markdown("### 🎯 MAPE")
+        
+                st.metric(
+                    label="Before (GFS)",
+                    value=f"{overall_mape_before:.2f}%"
+                )
+        
+                st.metric(
+                    label="After (Daily Forecast)",
+                    value=f"{overall_mape_after:.2f}%"
                 )
 
             with k2:
