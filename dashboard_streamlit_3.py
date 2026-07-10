@@ -205,10 +205,6 @@ else:
             
             st.markdown("### 📥 Export Forecast Data")
 
-            st.caption(
-                "Download the forecast dataset based on the selected date."
-            )
-    
             download_cols = [
                 "valid_time_ist",
                 "Actual_GHI",
@@ -250,12 +246,7 @@ else:
             cumulative_csv = cumulative_download_df.to_csv(
                 index=False
             ).encode("utf-8")
-    
-            st.markdown("#### Complete history")
-    
-            st.caption(
-                f"From the first available date through {selected_date}"
-            )
+
     
             st.download_button(
                 label="⬇️ Download data through selected date",
@@ -279,12 +270,6 @@ else:
             day_csv = day_download_df.to_csv(
                 index=False
             ).encode("utf-8")
-    
-            st.markdown("#### Selected day")
-    
-            st.caption(
-                f"Forecast data for {selected_date} only"
-            )
     
             st.download_button(
                 label="⬇️ Download selected-day data",
