@@ -200,7 +200,13 @@ else:
         st.plotly_chart(fig1, use_container_width=True, key="daily_forecast_main")
 
     with row1_space:
-        st.markdown("### 📥 Downloads")
+    with st.container(border=True):
+
+        st.markdown("### 📥 Export Forecast Data")
+
+        st.caption(
+            "Download the forecast dataset based on the selected date."
+        )
 
         download_cols = [
             "valid_time_ist",
@@ -218,50 +224,74 @@ else:
             "Two_Hour_Ahead_Forecast": "2-Hour Ahead Forecast GHI"
         }
 
-        # -----------------------------
-        # 1) Data from start to selected date
-        # -----------------------------
+        # =====================================================
+        # DOWNLOAD 1: START OF DATA TO SELECTED DATE
+        # =====================================================
+
         cumulative_download_df = df[
             df["valid_time_ist"].dt.date <= selected_date
         ].copy()
 
         cumulative_download_df["hour"] = (
-            cumulative_download_df["valid_time_ist"].dt.hour +
-            cumulative_download_df["valid_time_ist"].dt.minute / 60
+            cumulative_download_df["valid_time_ist"].dt.hour
+            + cumulative_download_df["valid_time_ist"].dt.minute / 60
         )
 
         cumulative_download_df = cumulative_download_df[
-            (cumulative_download_df["hour"] >= 6.5) &
-            (cumulative_download_df["hour"] <= 17.5)
+            (cumulative_download_df["hour"] >= 6.5)
+            & (cumulative_download_df["hour"] <= 17.5)
         ].copy()
 
-        cumulative_download_df = cumulative_download_df[download_cols].rename(
-            columns=rename_download_cols
+        cumulative_download_df = cumulative_download_df[
+            download_cols
+        ].rename(columns=rename_download_cols)
+
+        cumulative_csv = cumulative_download_df.to_csv(
+            index=False
+        ).encode("utf-8")
+
+        st.markdown("#### Complete history")
+
+        st.caption(
+            f"From the first available date through {selected_date}"
         )
 
-        cumulative_csv = cumulative_download_df.to_csv(index=False).encode("utf-8")
-
         st.download_button(
-            label="Download data till selected date",
+            label="⬇️ Download data through selected date",
             data=cumulative_csv,
-            file_name=f"forecast_data_till_{selected_date}.csv",
-            mime="text/csv"
+            file_name=f"forecast_data_through_{selected_date}.csv",
+            mime="text/csv",
+            use_container_width=True,
+            key="download_cumulative_forecast"
         )
 
-        # -----------------------------
-        # 2) Selected date only
-        # -----------------------------
-        day_download_df = day_df[download_cols].copy().rename(
-            columns=rename_download_cols
-        )
+        st.divider()
 
-        day_csv = day_download_df.to_csv(index=False).encode("utf-8")
+        # =====================================================
+        # DOWNLOAD 2: SELECTED DATE ONLY
+        # =====================================================
+
+        day_download_df = day_df[
+            download_cols
+        ].copy().rename(columns=rename_download_cols)
+
+        day_csv = day_download_df.to_csv(
+            index=False
+        ).encode("utf-8")
+
+        st.markdown("#### Selected day")
+
+        st.caption(
+            f"Forecast data for {selected_date} only"
+        )
 
         st.download_button(
-            label="Download selected day data",
+            label="⬇️ Download selected-day data",
             data=day_csv,
             file_name=f"forecast_data_{selected_date}.csv",
-            mime="text/csv"
+            mime="text/csv",
+            use_container_width=True,
+            key="download_selected_day_forecast"
         )
 
     # =====================================================
