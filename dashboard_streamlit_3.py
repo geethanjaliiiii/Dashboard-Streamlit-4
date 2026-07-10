@@ -319,7 +319,6 @@ else:
             ))
     
             fig2.update_layout(
-                title=None,
                 xaxis_title="Time",
                 yaxis_title="GHI",
                 height=430,
@@ -397,7 +396,6 @@ else:
                 )
     
             fig3.update_layout(
-                title=None,
                 xaxis_title="Time",
                 yaxis_title="GHI",
                 height=430,
