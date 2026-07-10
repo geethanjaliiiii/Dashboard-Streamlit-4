@@ -651,7 +651,7 @@ else:
         mape_after = ((actual - after).abs() / actual).mean() * 100
 
         st.markdown(
-            f"### 📊 Cumulative Forecast Performance "
+            f"### 📊 Cumulative Performance of Daily Forecast"
             f"({start_date} to {end_date})"
         )
 
