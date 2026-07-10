@@ -450,7 +450,11 @@ else:
         # PREVIOUS DAY LEFT PLOT
         # Actual GHI dotted + GFS GHI + Daily Forecast GHI
         # =====================================================
-
+        GFS_COLOR = "#636EFA"
+        ACTUAL_COLOR = "#2E9D57"
+        DAILY_FORECAST_COLOR = "red"
+        TWO_HOUR_COLOR_PREVIOUS = "red"
+        
         with prev_left:
             fig_prev1 = go.Figure()
 
@@ -459,14 +463,17 @@ else:
                 y=previous_df["Actual_GHI"],
                 mode="lines+markers",
                 name="Actual GHI",
-                line=dict(dash="dot")
+                line=dict(color=ACTUAL_COLOR, dash="dot"),
+                marker=dict(color=ACTUAL_COLOR)
             ))
-
+            
             fig_prev1.add_trace(go.Scatter(
                 x=previous_df["valid_time_ist"],
                 y=previous_df["GFS_GHI"],
                 mode="lines+markers",
-                name="GFS GHI"
+                name="GFS GHI",
+                line=dict(color=GFS_COLOR),
+                marker=dict(color=GFS_COLOR)
             ))
 
             fig_prev1.add_trace(go.Scatter(
@@ -474,8 +481,8 @@ else:
                 y=previous_df["Daily_Forecast_GHI"],
                 mode="lines+markers",
                 name="Daily Forecast GHI",
-                line=dict(color="red"),
-                marker=dict(color="red")
+                line=dict(color=DAILY_FORECAST_COLOR),
+                marker=dict(color=DAILY_FORECAST_COLOR)
             ))
 
             fig_prev1.update_layout(
@@ -541,21 +548,26 @@ else:
                     y=previous_two_hour_df["Actual_GHI"],
                     mode="lines+markers",
                     name="Actual GHI",
-                    line=dict(dash="dot")
+                    line=dict(color=ACTUAL_COLOR, dash="dot"),
+                    marker=dict(color=ACTUAL_COLOR)
                 ))
 
                 fig_prev2.add_trace(go.Scatter(
                     x=previous_two_hour_df["valid_time_ist"],
                     y=previous_two_hour_df["GFS_GHI"],
                     mode="lines+markers",
-                    name="GFS GHI"
+                    name="GFS GHI",
+                    line=dict(color=GFS_COLOR),
+                    marker=dict(color=GFS_COLOR)
                 ))
 
                 fig_prev2.add_trace(go.Scatter(
                     x=previous_two_hour_df["valid_time_ist"],
                     y=previous_two_hour_df["Two_Hour_Ahead_Forecast"],
                     mode="lines+markers",
-                    name="2-Hour Ahead Forecast"
+                    name="2-Hour Ahead Forecast",
+                    line=dict(color=TWO_HOUR_COLOR_PREVIOUS),
+                    marker=dict(color=TWO_HOUR_COLOR_PREVIOUS)
                 ))
 
                 prev2_tick_vals = previous_two_hour_df["valid_time_ist"]
