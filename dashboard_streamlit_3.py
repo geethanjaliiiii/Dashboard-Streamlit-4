@@ -200,99 +200,100 @@ else:
         st.plotly_chart(fig1, use_container_width=True, key="daily_forecast_main")
 
     with row1_space:
-    with st.container(border=True):
+        
+        with st.container(border=True):
+            
+            st.markdown("### 📥 Export Forecast Data")
 
-        st.markdown("### 📥 Export Forecast Data")
-
-        st.caption(
-            "Download the forecast dataset based on the selected date."
-        )
-
-        download_cols = [
-            "valid_time_ist",
-            "Actual_GHI",
-            "GFS_GHI",
-            "Daily_Forecast_GHI",
-            "Two_Hour_Ahead_Forecast"
-        ]
-
-        rename_download_cols = {
-            "valid_time_ist": "Time",
-            "Actual_GHI": "Actual GHI",
-            "GFS_GHI": "GFS GHI",
-            "Daily_Forecast_GHI": "Day Ahead Forecast GHI",
-            "Two_Hour_Ahead_Forecast": "2-Hour Ahead Forecast GHI"
-        }
-
-        # =====================================================
-        # DOWNLOAD 1: START OF DATA TO SELECTED DATE
-        # =====================================================
-
-        cumulative_download_df = df[
-            df["valid_time_ist"].dt.date <= selected_date
-        ].copy()
-
-        cumulative_download_df["hour"] = (
-            cumulative_download_df["valid_time_ist"].dt.hour
-            + cumulative_download_df["valid_time_ist"].dt.minute / 60
-        )
-
-        cumulative_download_df = cumulative_download_df[
-            (cumulative_download_df["hour"] >= 6.5)
-            & (cumulative_download_df["hour"] <= 17.5)
-        ].copy()
-
-        cumulative_download_df = cumulative_download_df[
-            download_cols
-        ].rename(columns=rename_download_cols)
-
-        cumulative_csv = cumulative_download_df.to_csv(
-            index=False
-        ).encode("utf-8")
-
-        st.markdown("#### Complete history")
-
-        st.caption(
-            f"From the first available date through {selected_date}"
-        )
-
-        st.download_button(
-            label="⬇️ Download data through selected date",
-            data=cumulative_csv,
-            file_name=f"forecast_data_through_{selected_date}.csv",
-            mime="text/csv",
-            use_container_width=True,
-            key="download_cumulative_forecast"
-        )
-
-        st.divider()
-
-        # =====================================================
-        # DOWNLOAD 2: SELECTED DATE ONLY
-        # =====================================================
-
-        day_download_df = day_df[
-            download_cols
-        ].copy().rename(columns=rename_download_cols)
-
-        day_csv = day_download_df.to_csv(
-            index=False
-        ).encode("utf-8")
-
-        st.markdown("#### Selected day")
-
-        st.caption(
-            f"Forecast data for {selected_date} only"
-        )
-
-        st.download_button(
-            label="⬇️ Download selected-day data",
-            data=day_csv,
-            file_name=f"forecast_data_{selected_date}.csv",
-            mime="text/csv",
-            use_container_width=True,
-            key="download_selected_day_forecast"
-        )
+            st.caption(
+                "Download the forecast dataset based on the selected date."
+            )
+    
+            download_cols = [
+                "valid_time_ist",
+                "Actual_GHI",
+                "GFS_GHI",
+                "Daily_Forecast_GHI",
+                "Two_Hour_Ahead_Forecast"
+            ]
+    
+            rename_download_cols = {
+                "valid_time_ist": "Time",
+                "Actual_GHI": "Actual GHI",
+                "GFS_GHI": "GFS GHI",
+                "Daily_Forecast_GHI": "Day Ahead Forecast GHI",
+                "Two_Hour_Ahead_Forecast": "2-Hour Ahead Forecast GHI"
+            }
+    
+            # =====================================================
+            # DOWNLOAD 1: START OF DATA TO SELECTED DATE
+            # =====================================================
+    
+            cumulative_download_df = df[
+                df["valid_time_ist"].dt.date <= selected_date
+            ].copy()
+    
+            cumulative_download_df["hour"] = (
+                cumulative_download_df["valid_time_ist"].dt.hour
+                + cumulative_download_df["valid_time_ist"].dt.minute / 60
+            )
+    
+            cumulative_download_df = cumulative_download_df[
+                (cumulative_download_df["hour"] >= 6.5)
+                & (cumulative_download_df["hour"] <= 17.5)
+            ].copy()
+    
+            cumulative_download_df = cumulative_download_df[
+                download_cols
+            ].rename(columns=rename_download_cols)
+    
+            cumulative_csv = cumulative_download_df.to_csv(
+                index=False
+            ).encode("utf-8")
+    
+            st.markdown("#### Complete history")
+    
+            st.caption(
+                f"From the first available date through {selected_date}"
+            )
+    
+            st.download_button(
+                label="⬇️ Download data through selected date",
+                data=cumulative_csv,
+                file_name=f"forecast_data_through_{selected_date}.csv",
+                mime="text/csv",
+                use_container_width=True,
+                key="download_cumulative_forecast"
+            )
+    
+            st.divider()
+    
+            # =====================================================
+            # DOWNLOAD 2: SELECTED DATE ONLY
+            # =====================================================
+    
+            day_download_df = day_df[
+                download_cols
+            ].copy().rename(columns=rename_download_cols)
+    
+            day_csv = day_download_df.to_csv(
+                index=False
+            ).encode("utf-8")
+    
+            st.markdown("#### Selected day")
+    
+            st.caption(
+                f"Forecast data for {selected_date} only"
+            )
+    
+            st.download_button(
+                label="⬇️ Download selected-day data",
+                data=day_csv,
+                file_name=f"forecast_data_{selected_date}.csv",
+                mime="text/csv",
+                use_container_width=True,
+                key="download_selected_day_forecast"
+            )
 
     # =====================================================
     # SECOND ROW: TWO PLOTS
