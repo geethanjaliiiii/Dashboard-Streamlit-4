@@ -290,120 +290,140 @@ else:
 
     left_col, right_col = st.columns(2)
 
+    left_col, right_col = st.columns(2)
+
     with left_col:
-        fig2 = go.Figure()
+        
+        with st.container(border=True):
+            
+            st.markdown("### GFS vs Daily Forecast GHI")
 
-        fig2.add_trace(go.Scatter(
-            x=day_df["valid_time_ist"],
-            y=day_df["GFS_GHI"],
-            mode="lines+markers",
-            name="GFS GHI",
-            line=dict(color=GFS_COLOR),
-            marker=dict(color=GFS_COLOR)
-        ))
-
-        fig2.add_trace(go.Scatter(
-            x=day_df["valid_time_ist"],
-            y=day_df["Daily_Forecast_GHI"],
-            mode="lines+markers",
-            name="Daily Forecast GHI",
-            line=dict(color="red"),
-            marker=dict(color="red")
-        ))
-
-        fig2.update_layout(
-            title="GFS vs Daily Forecast GHI",
-            xaxis_title="Time",
-            yaxis_title="GHI",
-            height=450,
-            legend=dict(
-                orientation="h",
-                yanchor="bottom",
-                y=1.02,
-                xanchor="right",
-                x=1
-            )
-        )
-
-        fig2.update_xaxes(
-            tickmode="array",
-            tickvals=day_df["valid_time_ist"],
-            ticktext=tick_times
-        )
-
-        fig2.update_yaxes(range=[0, ymax])
-
-        st.plotly_chart(fig2, use_container_width=True, key="gfs_vs_daily_forecast")
-
-
-    with right_col:
-        fig3 = go.Figure()
-
-        if has_two_hour_forecast:
-            fig3.add_trace(go.Scatter(
-                x=two_hour_df["valid_time_ist"],
-                y=two_hour_df["GFS_GHI"],
+            fig2 = go.Figure()
+    
+            fig2.add_trace(go.Scatter(
+                x=day_df["valid_time_ist"],
+                y=day_df["GFS_GHI"],
                 mode="lines+markers",
                 name="GFS GHI",
                 line=dict(color=GFS_COLOR),
                 marker=dict(color=GFS_COLOR)
             ))
-
-            fig3.add_trace(go.Scatter(
-                x=two_hour_df["valid_time_ist"],
-                y=two_hour_df["Two_Hour_Ahead_Forecast"],
+    
+            fig2.add_trace(go.Scatter(
+                x=day_df["valid_time_ist"],
+                y=day_df["Daily_Forecast_GHI"],
                 mode="lines+markers",
-                name="2-Hour Ahead Forecast",
-                line=dict(color=TWO_HOUR_COLOR),
-                marker=dict(color=TWO_HOUR_COLOR)
+                name="Daily Forecast GHI",
+                line=dict(color="red"),
+                marker=dict(color="red")
             ))
-
-            fig3_title = "GFS vs 2-Hour Ahead Forecast"
-            fig3_note = None
-            fig3_tick_vals = two_hour_df["valid_time_ist"]
-            fig3_tick_times = two_hour_df["valid_time_ist"].dt.strftime("%H:%M").tolist()
-
-        else:
-            fig3_title = "2-Hour Ahead Forecast Not Available"
-
-            selected_target_time = two_hour_end_time.strftime("%H:%M")
-
-            fig3_note = (
-                f"No 2-hour ahead forecast available on {selected_date} "
-                f"for selected time {selected_time.strftime('%H:%M')} "
-                f"(target time: {selected_target_time})"
+    
+            fig2.update_layout(
+                title=None,
+                xaxis_title="Time",
+                yaxis_title="GHI",
+                height=430,
+                margin=dict(l=20, r=20, t=45, b=20),
+                legend=dict(
+                    orientation="h",
+                    yanchor="bottom",
+                    y=1.02,
+                    xanchor="right",
+                    x=1
+                )
             )
-
-            fig3_tick_vals = day_df["valid_time_ist"]
-            fig3_tick_times = day_df["valid_time_ist"].dt.strftime("%H:%M").tolist()
-
-        fig3.update_layout(
-            title=fig3_title,
-            xaxis_title="Time",
-            yaxis_title="GHI",
-            height=450,
-            legend=dict(
-                orientation="h",
-                yanchor="bottom",
-                y=1.02,
-                xanchor="right",
-                x=1
+    
+            fig2.update_xaxes(
+                tickmode="array",
+                tickvals=day_df["valid_time_ist"],
+                ticktext=tick_times
             )
-        )
-
-        fig3.update_xaxes(
-            tickmode="array",
-            tickvals=fig3_tick_vals,
-            ticktext=fig3_tick_times
-        )
-
-        fig3.update_yaxes(range=[0, ymax])
-
-        if fig3_note is not None:
-
-            st.warning(fig3_note)
-
-        st.plotly_chart(fig3, use_container_width=True, key="two_hour_gfs_comparison")
+    
+            fig2.update_yaxes(range=[0, ymax])
+    
+            st.plotly_chart(
+                fig2,
+                use_container_width=True,
+                key="gfs_vs_daily_forecast"
+            )
+    
+    
+    with right_col:
+        with st.container(border=True):
+            st.markdown("### GFS vs 2-Hour Ahead Forecast")
+    
+            fig3 = go.Figure()
+    
+            if has_two_hour_forecast:
+                fig3.add_trace(go.Scatter(
+                    x=two_hour_df["valid_time_ist"],
+                    y=two_hour_df["GFS_GHI"],
+                    mode="lines+markers",
+                    name="GFS GHI",
+                    line=dict(color=GFS_COLOR),
+                    marker=dict(color=GFS_COLOR)
+                ))
+    
+                fig3.add_trace(go.Scatter(
+                    x=two_hour_df["valid_time_ist"],
+                    y=two_hour_df["Two_Hour_Ahead_Forecast"],
+                    mode="lines+markers",
+                    name="2-Hour Ahead Forecast",
+                    line=dict(color=TWO_HOUR_COLOR),
+                    marker=dict(color=TWO_HOUR_COLOR)
+                ))
+    
+                fig3_tick_vals = two_hour_df["valid_time_ist"]
+                fig3_tick_times = (
+                    two_hour_df["valid_time_ist"]
+                    .dt.strftime("%H:%M")
+                    .tolist()
+                )
+    
+            else:
+                selected_target_time = two_hour_end_time.strftime("%H:%M")
+    
+                st.warning(
+                    f"No 2-hour ahead forecast available on {selected_date} "
+                    f"for selected time {selected_time.strftime('%H:%M')} "
+                    f"(target time: {selected_target_time})"
+                )
+    
+                fig3_tick_vals = day_df["valid_time_ist"]
+                fig3_tick_times = (
+                    day_df["valid_time_ist"]
+                    .dt.strftime("%H:%M")
+                    .tolist()
+                )
+    
+            fig3.update_layout(
+                title=None,
+                xaxis_title="Time",
+                yaxis_title="GHI",
+                height=430,
+                margin=dict(l=20, r=20, t=45, b=20),
+                legend=dict(
+                    orientation="h",
+                    yanchor="bottom",
+                    y=1.02,
+                    xanchor="right",
+                    x=1
+                )
+            )
+    
+            fig3.update_xaxes(
+                tickmode="array",
+                tickvals=fig3_tick_vals,
+                ticktext=fig3_tick_times
+            )
+    
+            fig3.update_yaxes(range=[0, ymax])
+    
+            st.plotly_chart(
+                fig3,
+                use_container_width=True,
+                key="two_hour_gfs_comparison"
+            )
 
 
     # =====================================================
