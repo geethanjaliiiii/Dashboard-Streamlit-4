@@ -487,7 +487,7 @@ else:
             with st.container(border=True):
 
                 st.markdown(
-                    "### Previous Day: Actual vs GFS vs Daily Forecast"
+                    "### Actual vs GFS vs Daily Forecast"
                 )
 
                 fig_prev1 = go.Figure()
@@ -570,7 +570,7 @@ else:
             with st.container(border=True):
 
                 st.markdown(
-                    "### Previous Day: Actual vs GFS vs 2-Hour Ahead Forecast"
+                    "### Actual vs GFS vs 2-Hour Ahead Forecast"
                 )
 
                 fig_prev2 = go.Figure()
