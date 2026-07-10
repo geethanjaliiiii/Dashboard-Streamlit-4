@@ -260,7 +260,6 @@ else:
                 key="download_cumulative_forecast"
             )
     
-            st.divider()
     
             # =====================================================
             # DOWNLOAD 2: SELECTED DATE ONLY
