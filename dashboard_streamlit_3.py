@@ -794,7 +794,7 @@ else:
                     st.markdown(
                         f"""
                         <div style="
-                            color:#4c78d8;;
+                            color:#ff3b30;
                             font-size:2rem;
                             font-weight:700;
                             margin-top:-8px;
@@ -828,7 +828,7 @@ else:
                     st.markdown(
                         f"""
                         <div style="
-                            color:#4c78d8;;
+                            color:#ff3b30;
                             font-size:2rem;
                             font-weight:700;
                             margin-top:-8px;
@@ -862,7 +862,7 @@ else:
                     st.markdown(
                         f"""
                         <div style="
-                            color:#4c78d8;;
+                            color:#ff3b30;
                             font-size:2rem;
                             font-weight:700;
                             margin-top:-8px;
