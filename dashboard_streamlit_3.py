@@ -12,6 +12,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 from datetime import time
+from textwrap import dedent
 
 st.set_page_config(
     page_title="Solar GHI Forecasting Dashboard",
@@ -699,41 +700,133 @@ else:
         st.warning(
             "Not enough valid previous-day data to calculate cumulative forecast performance."
         )
+        
     # =====================================================
     # OVERALL FULL-DATA PERFORMANCE METRICS
     # =====================================================
 
+    # Theme-aware CSS used only by the overall performance section
+    st.markdown(
+        dedent(
+            """
+            <style>
+            .performance-header-card {
+                background-color: var(--secondary-background-color);
+                color: var(--text-color);
+                border: 1px solid rgba(128, 128, 128, 0.35);
+                border-radius: 14px;
+                padding: 18px;
+                min-height: 125px;
+                margin-bottom: 12px;
+            }
+
+            .performance-header-card h3,
+            .performance-header-card p {
+                color: var(--text-color) !important;
+            }
+
+            .performance-description {
+                color: var(--text-color) !important;
+                opacity: 0.75;
+                margin-top: 6px;
+                margin-bottom: 0;
+            }
+
+            .performance-metric-card {
+                background-color: var(--secondary-background-color);
+                color: var(--text-color);
+                border: 1px solid rgba(128, 128, 128, 0.35);
+                border-radius: 12px;
+                padding: 16px;
+                min-height: 390px;
+            }
+
+            .performance-metric-card p,
+            .performance-metric-card b {
+                color: var(--text-color) !important;
+            }
+
+            .performance-metric-card hr {
+                border: none;
+                border-top: 1px solid rgba(128, 128, 128, 0.35);
+                margin-top: 8px;
+                margin-bottom: 18px;
+            }
+
+            .performance-comparison-box {
+                background-color: var(--background-color);
+                color: var(--text-color);
+                border: 1px solid rgba(128, 128, 128, 0.30);
+                border-radius: 10px;
+                padding: 10px;
+                margin-bottom: 10px;
+            }
+
+            .performance-comparison-box b {
+                color: var(--text-color) !important;
+            }
+            </style>
+            """
+        ),
+        unsafe_allow_html=True
+    )
+
     overall_df = df.dropna(
-        subset=["Actual_GHI", "GFS_GHI", "Daily_Forecast_GHI"]
+        subset=[
+            "Actual_GHI",
+            "GFS_GHI",
+            "Daily_Forecast_GHI"
+        ]
     ).copy()
 
     overall_df["hour"] = (
-        overall_df["valid_time_ist"].dt.hour +
-        overall_df["valid_time_ist"].dt.minute / 60
+        overall_df["valid_time_ist"].dt.hour
+        + overall_df["valid_time_ist"].dt.minute / 60
     )
 
     overall_df = overall_df[
-        (overall_df["hour"] >= 6.5) &
-        (overall_df["hour"] <= 17.5) &
-        (overall_df["Actual_GHI"] > 50)
+        (overall_df["hour"] >= 6.5)
+        & (overall_df["hour"] <= 17.5)
+        & (overall_df["Actual_GHI"] > 50)
     ].copy()
 
     if not overall_df.empty:
 
+        # =====================================================
+        # DAILY FORECAST OVERALL METRICS
+        # =====================================================
+
         actual_all = overall_df["Actual_GHI"]
-        before_all = overall_df["GFS_GHI"]
-        after_all = overall_df["Daily_Forecast_GHI"]
+        gfs_all = overall_df["GFS_GHI"]
+        daily_all = overall_df["Daily_Forecast_GHI"]
 
-        overall_mape_before = ((actual_all - before_all).abs() / actual_all).mean() * 100
-        overall_mape_after = ((actual_all - after_all).abs() / actual_all).mean() * 100
+        overall_mape_before = (
+            ((actual_all - gfs_all).abs() / actual_all).mean() * 100
+        )
 
-        overall_mae_before = (actual_all - before_all).abs().mean()
-        overall_mae_after = (actual_all - after_all).abs().mean()
+        overall_mape_after = (
+            ((actual_all - daily_all).abs() / actual_all).mean() * 100
+        )
 
-        overall_rmse_before = np.sqrt(((actual_all - before_all) ** 2).mean())
-        overall_rmse_after = np.sqrt(((actual_all - after_all) ** 2).mean())
+        overall_mae_before = (
+            (actual_all - gfs_all).abs().mean()
+        )
 
-        st.markdown("## 📌 Performance Summary on Complete Dataset")
+        overall_mae_after = (
+            (actual_all - daily_all).abs().mean()
+        )
+
+        overall_rmse_before = np.sqrt(
+            ((actual_all - gfs_all) ** 2).mean()
+        )
+
+        overall_rmse_after = np.sqrt(
+            ((actual_all - daily_all) ** 2).mean()
+        )
+
+        st.markdown(
+            "## 📌 Performance Summary on Complete Dataset"
+        )
 
         left_summary, right_summary = st.columns([1, 1])
 
@@ -742,13 +835,21 @@ else:
         # =====================================================
 
         with left_summary:
+
             st.markdown(
-                """
-                <div style="border:1px solid #bcdcff; border-radius:14px; padding:18px; background-color:#f8fbff;">
-                    <h3 style="margin-bottom:2px;">📈 Daily Forecast GHI: Overall Forecast Performance</h3>
-                    <p style="color:#557; margin-top:0;">Comparison of Original GFS vs Daily Forecast GHI</p>
-                </div>
-                """,
+                dedent(
+                    """
+                    <div class="performance-header-card">
+                        <h3 style="margin-bottom:2px;">
+                            📈 Daily Forecast GHI: Overall Forecast Performance
+                        </h3>
+
+                        <p class="performance-description">
+                            Comparison of Original GFS and Daily Forecast GHI
+                        </p>
+                    </div>
+                    """
+                ),
                 unsafe_allow_html=True
             )
 
@@ -756,46 +857,85 @@ else:
 
             with k1:
                 st.markdown(
-                    f"""
-                    <div style="border:1px solid #bcdcff; border-radius:12px; padding:18px; background-color:white;">
-                        <h3 style="color:#1f4fd6;">🎯 MAPE</h3>
-                        <hr>
-                        <p><b>Before (GFS)</b></p>
-                        <h2 style="color:#1f4fd6;">{overall_mape_before:.2f}%</h2>
-                        <p><b>After (Daily Forecast)</b></p>
-                        <h2 style="color:red;">{overall_mape_after:.2f}%</h2>
-                    </div>
-                    """,
+                    dedent(
+                        f"""
+                        <div class="performance-metric-card">
+                            <h3 style="color:#4c78d8;">
+                                🎯 MAPE
+                            </h3>
+
+                            <hr>
+
+                            <p><b>Before (GFS)</b></p>
+
+                            <h2 style="color:#4c78d8;">
+                                {overall_mape_before:.2f}%
+                            </h2>
+
+                            <p><b>After (Daily Forecast)</b></p>
+
+                            <h2 style="color:#ff3b30;">
+                                {overall_mape_after:.2f}%
+                            </h2>
+                        </div>
+                        """
+                    ),
                     unsafe_allow_html=True
                 )
 
             with k2:
                 st.markdown(
-                    f"""
-                    <div style="border:1px solid #bfe5c2; border-radius:12px; padding:18px; background-color:white;">
-                        <h3 style="color:#2e8b57;">📊 MAE</h3>
-                        <hr>
-                        <p><b>Before (GFS)</b></p>
-                        <h2 style="color:#1f4fd6;">{overall_mae_before:.2f}</h2>
-                        <p><b>After (Daily Forecast)</b></p>
-                        <h2 style="color:red;">{overall_mae_after:.2f}</h2>
-                    </div>
-                    """,
+                    dedent(
+                        f"""
+                        <div class="performance-metric-card">
+                            <h3 style="color:#2e9d57;">
+                                📊 MAE
+                            </h3>
+
+                            <hr>
+
+                            <p><b>Before (GFS)</b></p>
+
+                            <h2 style="color:#4c78d8;">
+                                {overall_mae_before:.2f}
+                            </h2>
+
+                            <p><b>After (Daily Forecast)</b></p>
+
+                            <h2 style="color:#ff3b30;">
+                                {overall_mae_after:.2f}
+                            </h2>
+                        </div>
+                        """
+                    ),
                     unsafe_allow_html=True
                 )
 
             with k3:
                 st.markdown(
-                    f"""
-                    <div style="border:1px solid #d8c8ff; border-radius:12px; padding:18px; background-color:white;">
-                        <h3 style="color:#6f42c1;">〽️ RMSE</h3>
-                        <hr>
-                        <p><b>Before (GFS)</b></p>
-                        <h2 style="color:#1f4fd6;">{overall_rmse_before:.2f}</h2>
-                        <p><b>After (Daily Forecast)</b></p>
-                        <h2 style="color:red;">{overall_rmse_after:.2f}</h2>
-                    </div>
-                    """,
+                    dedent(
+                        f"""
+                        <div class="performance-metric-card">
+                            <h3 style="color:#8a4fd3;">
+                                〽️ RMSE
+                            </h3>
+
+                            <hr>
+
+                            <p><b>Before (GFS)</b></p>
+
+                            <h2 style="color:#4c78d8;">
+                                {overall_rmse_before:.2f}
+                            </h2>
+
+                            <p><b>After (Daily Forecast)</b></p>
+
+                            <h2 style="color:#ff3b30;">
+                                {overall_rmse_after:.2f}
+                            </h2>
+                        </div>
+                        """
+                    ),
                     unsafe_allow_html=True
                 )
 
@@ -804,6 +944,7 @@ else:
         # =====================================================
 
         with right_summary:
+
             two_hour_metrics_df = overall_df.dropna(
                 subset=["Two_Hour_Ahead_Forecast"]
             ).copy()
@@ -812,28 +953,70 @@ else:
 
                 actual_2hr = two_hour_metrics_df["Actual_GHI"]
                 gfs_2hr = two_hour_metrics_df["GFS_GHI"]
-                daily_2hr = two_hour_metrics_df["Daily_Forecast_GHI"]
-                twohr_forecast = two_hour_metrics_df["Two_Hour_Ahead_Forecast"]
+                daily_2hr = two_hour_metrics_df[
+                    "Daily_Forecast_GHI"
+                ]
+                forecast_2hr = two_hour_metrics_df[
+                    "Two_Hour_Ahead_Forecast"
+                ]
 
-                mape_gfs = ((actual_2hr - gfs_2hr).abs() / actual_2hr).mean() * 100
-                mape_daily = ((actual_2hr - daily_2hr).abs() / actual_2hr).mean() * 100
-                mape_2hr = ((actual_2hr - twohr_forecast).abs() / actual_2hr).mean() * 100
+                # MAPE
+                mape_gfs = (
+                    ((actual_2hr - gfs_2hr).abs() / actual_2hr).mean()
+                    * 100
+                )
 
-                mae_gfs = (actual_2hr - gfs_2hr).abs().mean()
-                mae_daily = (actual_2hr - daily_2hr).abs().mean()
-                mae_2hr = (actual_2hr - twohr_forecast).abs().mean()
+                mape_daily = (
+                    ((actual_2hr - daily_2hr).abs() / actual_2hr).mean()
+                    * 100
+                )
 
-                rmse_gfs = np.sqrt(((actual_2hr - gfs_2hr) ** 2).mean())
-                rmse_daily = np.sqrt(((actual_2hr - daily_2hr) ** 2).mean())
-                rmse_2hr = np.sqrt(((actual_2hr - twohr_forecast) ** 2).mean())
+                mape_2hr = (
+                    ((actual_2hr - forecast_2hr).abs() / actual_2hr).mean()
+                    * 100
+                )
+
+                # MAE
+                mae_gfs = (
+                    (actual_2hr - gfs_2hr).abs().mean()
+                )
+
+                mae_daily = (
+                    (actual_2hr - daily_2hr).abs().mean()
+                )
+
+                mae_2hr = (
+                    (actual_2hr - forecast_2hr).abs().mean()
+                )
+
+                # RMSE
+                rmse_gfs = np.sqrt(
+                    ((actual_2hr - gfs_2hr) ** 2).mean()
+                )
+
+                rmse_daily = np.sqrt(
+                    ((actual_2hr - daily_2hr) ** 2).mean()
+                )
+
+                rmse_2hr = np.sqrt(
+                    ((actual_2hr - forecast_2hr) ** 2).mean()
+                )
 
                 st.markdown(
-                    """
-                    <div style="border:1px solid #f0c29b; border-radius:14px; padding:18px; background-color:#fffaf5;">
-                        <h3 style="margin-bottom:2px;">🕒 2-Hour Ahead Forecast: Overall Performance</h3>
-                        <p style="color:#775; margin-top:0;">Performance using only rows where 2-Hour Ahead Forecast is available</p>
-                    </div>
-                    """,
+                    dedent(
+                        """
+                        <div class="performance-header-card">
+                            <h3 style="margin-bottom:2px;">
+                                🕒 2-Hour Ahead Forecast: Overall Performance
+                            </h3>
+
+                            <p class="performance-description">
+                                Calculated only for rows where
+                                2-Hour Ahead Forecast is available
+                            </p>
+                        </div>
+                        """
+                    ),
                     unsafe_allow_html=True
                 )
 
@@ -841,69 +1024,162 @@ else:
 
                 with h1:
                     st.markdown(
-                        f"""
-                        <div style="border:1px solid #f0c29b; border-radius:12px; padding:16px; background-color:white;">
-                            <h3 style="color:#d95f02;">🎯 MAPE</h3>
-                            <div style="border-radius:10px; background-color:#f7fbff; padding:10px; margin-bottom:10px;">
-                                <b>Actual vs GFS</b><br>
-                                <span style="color:#1f4fd6; font-size:26px; font-weight:bold;">{mape_gfs:.2f}%</span>
+                        dedent(
+                            f"""
+                            <div class="performance-metric-card">
+                                <h3 style="color:#e66a00;">
+                                    🎯 MAPE
+                                </h3>
+
+                                <div class="performance-comparison-box">
+                                    <b>Actual vs GFS</b><br>
+
+                                    <span style="
+                                        color:#4c78d8;
+                                        font-size:26px;
+                                        font-weight:bold;
+                                    ">
+                                        {mape_gfs:.2f}%
+                                    </span>
+                                </div>
+
+                                <div class="performance-comparison-box">
+                                    <b>Actual vs Daily Forecast</b><br>
+
+                                    <span style="
+                                        color:#2e9d57;
+                                        font-size:26px;
+                                        font-weight:bold;
+                                    ">
+                                        {mape_daily:.2f}%
+                                    </span>
+                                </div>
+
+                                <div class="performance-comparison-box">
+                                    <b>Actual vs 2-Hour Ahead</b><br>
+
+                                    <span style="
+                                        color:#e66a00;
+                                        font-size:26px;
+                                        font-weight:bold;
+                                    ">
+                                        {mape_2hr:.2f}%
+                                    </span>
+                                </div>
                             </div>
-                            <div style="border-radius:10px; background-color:#f8fff8; padding:10px; margin-bottom:10px;">
-                                <b>Actual vs Daily Forecast</b><br>
-                                <span style="color:#2e8b57; font-size:26px; font-weight:bold;">{mape_daily:.2f}%</span>
-                            </div>
-                            <div style="border-radius:10px; background-color:#fff7ef; padding:10px;">
-                                <b>Actual vs 2-Hour Ahead</b><br>
-                                <span style="color:#d95f02; font-size:26px; font-weight:bold;">{mape_2hr:.2f}%</span>
-                            </div>
-                        </div>
-                        """,
+                            """
+                        ),
                         unsafe_allow_html=True
                     )
 
                 with h2:
                     st.markdown(
-                        f"""
-                        <div style="border:1px solid #f0c29b; border-radius:12px; padding:16px; background-color:white;">
-                            <h3 style="color:#d95f02;">📊 MAE</h3>
-                            <div style="border-radius:10px; background-color:#f7fbff; padding:10px; margin-bottom:10px;">
-                                <b>Actual vs GFS</b><br>
-                                <span style="color:#1f4fd6; font-size:26px; font-weight:bold;">{mae_gfs:.2f}</span>
+                        dedent(
+                            f"""
+                            <div class="performance-metric-card">
+                                <h3 style="color:#e66a00;">
+                                    📊 MAE
+                                </h3>
+
+                                <div class="performance-comparison-box">
+                                    <b>Actual vs GFS</b><br>
+
+                                    <span style="
+                                        color:#4c78d8;
+                                        font-size:26px;
+                                        font-weight:bold;
+                                    ">
+                                        {mae_gfs:.2f}
+                                    </span>
+                                </div>
+
+                                <div class="performance-comparison-box">
+                                    <b>Actual vs Daily Forecast</b><br>
+
+                                    <span style="
+                                        color:#2e9d57;
+                                        font-size:26px;
+                                        font-weight:bold;
+                                    ">
+                                        {mae_daily:.2f}
+                                    </span>
+                                </div>
+
+                                <div class="performance-comparison-box">
+                                    <b>Actual vs 2-Hour Ahead</b><br>
+
+                                    <span style="
+                                        color:#e66a00;
+                                        font-size:26px;
+                                        font-weight:bold;
+                                    ">
+                                        {mae_2hr:.2f}
+                                    </span>
+                                </div>
                             </div>
-                            <div style="border-radius:10px; background-color:#f8fff8; padding:10px; margin-bottom:10px;">
-                                <b>Actual vs Daily Forecast</b><br>
-                                <span style="color:#2e8b57; font-size:26px; font-weight:bold;">{mae_daily:.2f}</span>
-                            </div>
-                            <div style="border-radius:10px; background-color:#fff7ef; padding:10px;">
-                                <b>Actual vs 2-Hour Ahead</b><br>
-                                <span style="color:#d95f02; font-size:26px; font-weight:bold;">{mae_2hr:.2f}</span>
-                            </div>
-                        </div>
-                        """,
+                            """
+                        ),
                         unsafe_allow_html=True
                     )
 
                 with h3:
                     st.markdown(
-                        f"""
-                        <div style="border:1px solid #f0c29b; border-radius:12px; padding:16px; background-color:white;">
-                            <h3 style="color:#d95f02;">〽️ RMSE</h3>
-                            <div style="border-radius:10px; background-color:#f7fbff; padding:10px; margin-bottom:10px;">
-                                <b>Actual vs GFS</b><br>
-                                <span style="color:#1f4fd6; font-size:26px; font-weight:bold;">{rmse_gfs:.2f}</span>
+                        dedent(
+                            f"""
+                            <div class="performance-metric-card">
+                                <h3 style="color:#e66a00;">
+                                    〽️ RMSE
+                                </h3>
+
+                                <div class="performance-comparison-box">
+                                    <b>Actual vs GFS</b><br>
+
+                                    <span style="
+                                        color:#4c78d8;
+                                        font-size:26px;
+                                        font-weight:bold;
+                                    ">
+                                        {rmse_gfs:.2f}
+                                    </span>
+                                </div>
+
+                                <div class="performance-comparison-box">
+                                    <b>Actual vs Daily Forecast</b><br>
+
+                                    <span style="
+                                        color:#2e9d57;
+                                        font-size:26px;
+                                        font-weight:bold;
+                                    ">
+                                        {rmse_daily:.2f}
+                                    </span>
+                                </div>
+
+                                <div class="performance-comparison-box">
+                                    <b>Actual vs 2-Hour Ahead</b><br>
+
+                                    <span style="
+                                        color:#e66a00;
+                                        font-size:26px;
+                                        font-weight:bold;
+                                    ">
+                                        {rmse_2hr:.2f}
+                                    </span>
+                                </div>
                             </div>
-                            <div style="border-radius:10px; background-color:#f8fff8; padding:10px; margin-bottom:10px;">
-                                <b>Actual vs Daily Forecast</b><br>
-                                <span style="color:#2e8b57; font-size:26px; font-weight:bold;">{rmse_daily:.2f}</span>
-                            </div>
-                            <div style="border-radius:10px; background-color:#fff7ef; padding:10px;">
-                                <b>Actual vs 2-Hour Ahead</b><br>
-                                <span style="color:#d95f02; font-size:26px; font-weight:bold;">{rmse_2hr:.2f}</span>
-                            </div>
-                        </div>
-                        """,
+                            """
+                        ),
                         unsafe_allow_html=True
                     )
 
             else:
-                st.warning("No valid 2-hour ahead forecast data available for overall performance.")
+                st.warning(
+                    "No valid 2-hour ahead forecast data is available "
+                    "for overall performance."
+                )
+
+    else:
+        st.warning(
+            "Not enough valid data to calculate "
+            "complete-dataset performance metrics."
+        )
