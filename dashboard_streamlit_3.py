@@ -155,10 +155,10 @@ else:
         y=day_df["Daily_Forecast_GHI"],
         mode="lines+markers",
         name="Daily Forecast GHI",
-        line=dict(color="red", width=2),
-        marker=dict(color="red"),
+        line=dict(color="#F05A5A", width=2),
+        marker=dict(color="#F05A5A"),
         fill="tozeroy",
-        fillcolor="rgba(255, 0, 0, 0.25)"
+        fillcolor="rgba(240, 90, 90, 0.25)"
     ))
 
     if has_two_hour_forecast:
