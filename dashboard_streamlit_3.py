@@ -145,6 +145,9 @@ else:
     # FIRST ROW: DAILY FORECAST GHI ONLY
     # =====================================================
 
+    GFS_COLOR = "#636EFA"
+    TWO_HOUR_COLOR = "#76B7F2"
+    
     fig1 = go.Figure()
 
     fig1.add_trace(go.Scatter(
@@ -165,8 +168,8 @@ else:
             y=two_hour_df["Two_Hour_Ahead_Forecast"],
             mode="lines+markers",
             name="2-Hour Ahead Forecast",
-            line=dict(color="#76B7F2"),
-            marker=dict(color="#76B7F2")
+            line=dict(color=TWO_HOUR_COLOR),
+            marker=dict(color=TWO_HOUR_COLOR)
         ))
 
     else:
@@ -295,7 +298,9 @@ else:
             x=day_df["valid_time_ist"],
             y=day_df["GFS_GHI"],
             mode="lines+markers",
-            name="GFS GHI"
+            name="GFS GHI",
+            line=dict(color=GFS_COLOR),
+            marker=dict(color=GFS_COLOR)
         ))
 
         fig2.add_trace(go.Scatter(
@@ -340,14 +345,18 @@ else:
                 x=two_hour_df["valid_time_ist"],
                 y=two_hour_df["GFS_GHI"],
                 mode="lines+markers",
-                name="GFS GHI"
+                name="GFS GHI",
+                line=dict(color=GFS_COLOR),
+                marker=dict(color=GFS_COLOR)
             ))
 
             fig3.add_trace(go.Scatter(
                 x=two_hour_df["valid_time_ist"],
                 y=two_hour_df["Two_Hour_Ahead_Forecast"],
                 mode="lines+markers",
-                name="2-Hour Ahead Forecast"
+                name="2-Hour Ahead Forecast",
+                line=dict(color=TWO_HOUR_COLOR),
+                marker=dict(color=TWO_HOUR_COLOR)
             ))
 
             fig3_title = "GFS vs 2-Hour Ahead Forecast"
